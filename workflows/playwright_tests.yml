@@ -26,9 +26,25 @@ jobs:
       run: python -m pytest tests/ --alluredir=allure-results
       # This runs all your UI, API, and Hybrid tests!
 
-    - name: Upload Allure Results
-      if: always() # Upload even if tests fail
-      uses: actions/upload-artifact@v4
-      with:
-        name: allure-results
-        path: allure-results
+    - name: Get Allure history
+    - uses: actions/checkout@v4
+    - if: always()
+    - continue-on-error: true
+    - with:
+    - ref: gh-pages
+    - path: gh-pages
+
+    - name: Generate Allure Report
+    - uses: simple-elf/allure-report-action@master
+    - if: always()
+    - with:
+    - allure_results: allure-results
+    - allure_history: allure-history
+    - keep_reports: 20
+
+    - name: Deploy report to Github Pages
+    - if: always()
+    - uses: peaceiris/actions-gh-pages@v3
+    - with:
+    - github_token: ${{ secrets.GITHUB_TOKEN }}
+    - publish_dir: allure-history

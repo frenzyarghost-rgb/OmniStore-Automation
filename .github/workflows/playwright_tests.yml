@@ -1,19 +1,14 @@
 name: OmniStore Regression Suite
-on: 
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-  workflow_dispatch: # Allows you to run tests manually with a button!
+on: [push, pull_request]
 
 jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
-    
+
     steps:
     - uses: actions/checkout@v4
-    
+
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
@@ -24,15 +19,32 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Install Playwright Browsers
+    - name: Ensure Playwright Browsers are installed
       run: playwright install --with-deps
 
-    - name: Run All Tests (UI, API, Hybrid)
+    - name: Run Playwright Tests
+      if: always()
       run: python -m pytest tests/ --alluredir=allure-results
 
-    - name: Upload Allure Results
+    - name: Get Allure history
+      uses: actions/checkout@v4
       if: always()
-      uses: actions/upload-artifact@v4
+      continue-on-error: true
       with:
-        name: allure-results
-        path: allure-results
+        ref: gh-pages
+        path: gh-pages
+
+    - name: Generate Allure Report
+      uses: simple-elf/allure-report-action@master
+      if: always()
+      with:
+        allure_results: allure-results
+        allure_history: allure-history
+        keep_reports: 20
+
+    - name: Deploy report to Github Pages
+      if: always()
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: allure-history

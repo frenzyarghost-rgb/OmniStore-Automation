@@ -1,13 +1,13 @@
 name: OmniStore Regression Suite
-on: [push, pull_request] # Run on every code change
+on: [push, pull_request]
 
 jobs:
   test:
     timeout-minutes: 60
-    runs-on: ubuntu-latest # Use a Linux server in the cloud
+    runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4 # Get your code
+    - uses: actions/checkout@v4
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -23,28 +23,28 @@ jobs:
       run: playwright install --with-deps
 
     - name: Run Playwright Tests
+      if: always()
       run: python -m pytest tests/ --alluredir=allure-results
-      # This runs all your UI, API, and Hybrid tests!
 
     - name: Get Allure history
-    - uses: actions/checkout@v4
-    - if: always()
-    - continue-on-error: true
-    - with:
-    - ref: gh-pages
-    - path: gh-pages
+      uses: actions/checkout@v4
+      if: always()
+      continue-on-error: true
+      with:
+        ref: gh-pages
+        path: gh-pages
 
     - name: Generate Allure Report
-    - uses: simple-elf/allure-report-action@master
-    - if: always()
-    - with:
-    - allure_results: allure-results
-    - allure_history: allure-history
-    - keep_reports: 20
+      uses: simple-elf/allure-report-action@master
+      if: always()
+      with:
+        allure_results: allure-results
+        allure_history: allure-history
+        keep_reports: 20
 
     - name: Deploy report to Github Pages
-    - if: always()
-    - uses: peaceiris/actions-gh-pages@v3
-    - with:
-    - github_token: ${{ secrets.GITHUB_TOKEN }}
-    - publish_dir: allure-history
+      if: always()
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: allure-history

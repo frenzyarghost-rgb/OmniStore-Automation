@@ -18,7 +18,9 @@ def load_test_data():
 @pytest.mark.ui
 # This decorator tells pytest to run the test 3 times with these inputs
 @pytest.mark.parametrize("search_term", load_test_data())
-def test_duckduckgo_json_driven(search_page, search_term):
+def test_duckduckgo_json_driven(page, search_page, search_term):
+    # Now 'page' is defined and can be used!
+    page.goto("https://www.duckduckgo.com")
     search_page.search_for_term(search_term)
 
     # Use 'expect' instead of 'assert'.

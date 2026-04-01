@@ -4,7 +4,9 @@ class BasePage:
         self.page = page
 
     def navigate(self, url):
-        self.page.goto(url)
+        # 'networkidle' is the secret sauce. It waits until no new
+        # network requests are being made for 500ms.
+        self.page.goto(url, wait_until="networkidle")
 
     def get_title(self):
         return self.page.title()

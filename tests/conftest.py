@@ -39,3 +39,14 @@ def pytest_runtest_makereport(item, call):
                 name=f"Failed_{item.name}",
                 attachment_type=allure.attachment_type.PNG
             )
+
+        # 4. ... inside your if report.failed block ...
+        if page:
+            # Add a tiny 'Breath' so the browser can render pixels
+            page.wait_for_timeout(500)
+            screenshot = page.screenshot(full_page=True)
+            allure.attach(
+                screenshot,
+                name=f"Failed_{item.name}",
+                attachment_type=allure.attachment_type.PNG
+            )

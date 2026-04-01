@@ -5,6 +5,11 @@ jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
+    # --- ADD THIS PART BELOW ---
+    strategy:
+      matrix:
+        browser: [chromium, webkit] # This creates two parallel runs
+    # ---------------------------
 
     steps:
     - uses: actions/checkout@v4
@@ -24,7 +29,9 @@ jobs:
 
     - name: Run Playwright Tests
       if: always()
-      run: python -m pytest tests/ --alluredir=allure-results
+      # --- UPDATE THIS LINE TO USE THE MATRIX ---
+      run: python -m pytest tests/ --browser ${{ matrix.browser }} --alluredir=allure-results
+      # ------------------------------------------
 
     - name: Get Allure history
       uses: actions/checkout@v4
